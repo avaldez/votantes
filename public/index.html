@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1">
+    <meta name="description" content="Registro de posibles votantes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="theme-color" content="#0f172a">
+    <title>Registro de Votantes</title>
+    <link rel="stylesheet" href="/css/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- jsPDF for PDF export -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.1/jspdf.plugin.autotable.min.js"></script>
+</head>
+<body>
+
+<div class="app">
+    <!-- Header -->
+    <header class="app-header">
+        <div class="header-top">
+            <div class="header-brand">
+                <div class="brand-icon"><i class="fas fa-vote-yea"></i></div>
+                <div class="brand-text">
+                    <h1>VotaRegistro</h1>
+                    <span>Registro de Votantes</span>
+                </div>
+            </div>
+            <div class="header-actions">
+                <button class="btn btn-outline btn-icon" onclick="loadStats();loadVoters()" title="Recargar">
+                    <i class="fas fa-sync-alt"></i>
+                </button>
+            </div>
+        </div>
+        <div class="search-bar">
+            <i class="fas fa-search"></i>
+            <input type="text" id="search-input" placeholder="Buscar por nombre, cedula o barrio...">
+        </div>
+    </header>
+
+    <!-- Stats -->
+    <div class="stats-bar" id="stats-bar">
+        <div class="stat-chip">
+            <div class="stat-num" id="stat-total">0</div>
+            <div class="stat-label">Total Votantes</div>
+        </div>
+        <div class="stat-chip" id="stat-barrio-chip" style="display:none">
+            <div class="stat-num" id="stat-barrio-num">0</div>
+            <div class="stat-label" id="stat-barrio-label">Barrios</div>
+        </div>
+    </div>
+
+    <!-- Voters List -->
+    <div class="voters-list" id="voters-list">
+        <div class="loading">
+            <i class="fas fa-spinner fa-spin"></i>
+            <p>Cargando...</p>
+        </div>
+    </div>
+
+    <!-- Pagination -->
+    <div class="pagination" id="pagination" style="display:none"></div>
+</div>
+
+<!-- Bottom Navigation -->
+<div class="bottom-nav">
+    <button class="btn btn-primary" onclick="openNewModal()">
+        <i class="fas fa-plus"></i> Nuevo Votante
+    </button>
+    <button class="btn btn-export" onclick="toggleExportMenu()">
+        <i class="fas fa-download"></i> Exportar
+    </button>
+</div>
+
+<!-- Export Menu -->
+<div class="export-menu" id="export-menu">
+    <button class="export-menu-item" onclick="exportCSV()">
+        <i class="fas fa-file-csv csv"></i> Exportar CSV
+    </button>
+    <button class="export-menu-item" onclick="exportPDF()">
+        <i class="fas fa-file-pdf pdf"></i> Exportar PDF
+    </button>
+</div>
+
+<!-- Modal: Nuevo/Editar Votante -->
+<div class="modal-overlay" id="modal-votante">
+    <div class="modal">
+        <div class="modal-handle"><span></span></div>
+        <div class="modal-header">
+            <h3><i class="fas fa-user-plus"></i> <span id="modal-title">Nuevo Votante</span></h3>
+            <button class="modal-close" onclick="closeModal()"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="modal-body">
+            <form id="form-votante">
+                <input type="hidden" id="votante-id">
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Nombre *</label>
+                        <input type="text" class="form-control" id="votante-nombre" required placeholder="Nombre">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Apellido *</label>
+                        <input type="text" class="form-control" id="votante-apellido" required placeholder="Apellido">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Cedula de Identidad *</label>
+                    <input type="text" class="form-control" id="votante-cedula" required placeholder="Numero de cedula">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Direccion</label>
+                    <input type="text" class="form-control" id="votante-direccion" placeholder="Direccion completa">
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Barrio</label>
+                        <input type="text" class="form-control" id="votante-barrio" placeholder="Barrio">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Local de Voto</label>
+                        <input type="text" class="form-control" id="votante-local" placeholder="Donde vota">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Celular</label>
+                        <input type="tel" class="form-control" id="votante-celular" placeholder="Numero celular">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Correo</label>
+                        <input type="email" class="form-control" id="votante-correo" placeholder="correo@email.com">
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-outline" onclick="closeModal()">Cancelar</button>
+            <button class="btn btn-primary" onclick="saveVotante()">
+                <i class="fas fa-save"></i> Guardar
+            </button>
+        </div>
+    </div>
+</div>
+
+<script src="/js/app.js"></script>
+</body>
+</html>
